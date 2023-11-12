@@ -1,4 +1,5 @@
-from app.models import Category, Product
+from app.models import Category, Product, User
+
 
 def load_categories():
     # return [{
@@ -12,6 +13,7 @@ def load_categories():
     #     'name': 'Sony'
     # }]
     return Category.query.all()
+
 
 def load_products(kw=None):
     # pros = [{
@@ -56,3 +58,7 @@ def load_products(kw=None):
         pros = pros.filter(Product.name.contains(kw))
 
     return pros.all()
+
+
+def get_user_by_id(user_id):
+    return User.query.get(user_id)
