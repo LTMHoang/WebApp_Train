@@ -1,11 +1,9 @@
-from flask import render_template, request
+from flask import render_template, request, redirect
+from flask_login import login_user
 import dao
 from app import app, login
-
-# # Tự thêm 12/11
-# from flask_login import login_user
-# from app.models import User
-# from flask import redirect
+from app.models import *
+import hashlib
 
 
 @app.route('/')
@@ -30,17 +28,22 @@ def get_user(user_id):
     return dao.get_user_by_id(user_id)
 
 
-# # Tự thêm 12/11
-# @app.route("/login-admin", methods=['get', 'post'])
-# def login_admin():
-#     if request.method == 'POST':
-#         username = request.form.get("username")
-#         password = request.form.get("password")
-#         user = User.query.filter(username == username, password == password).first()
-#         if user:
-#             login_user(user=user)
-#
-#     return redirect("/admin")
+@login.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
+
+@app.route("/login-admin", methods=['get', 'post'])
+def login_admin():
+    if request.method == 'POST':
+        username = request.form.get("username")
+        password = request.form.get("password", "")
+        password = str(hashlib.md5(password.strip().encode("utf-8")).hexdigest())
+        user = User.query.filter(User.username == username.strip(), User.password == password).first()
+        if user:
+            login_user(user=user)
+
+    return redirect("/admin")
 
 
 if __name__ == '__main__':
