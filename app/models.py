@@ -1,7 +1,12 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from app import db, app
 from flask_login import UserMixin
+import enum
+
+class UserRoleEnum(enum.Enum):
+    USER = 1
+    ADMIN = 2
 
 
 class User(db.Model, UserMixin):
@@ -10,6 +15,7 @@ class User(db.Model, UserMixin):
     username = Column(String(50), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
     avatar = Column(String(100), default='https://genshin-guide.com/wp-content/uploads/yae-miko.png')
+    user_role = Column(Enum(UserRoleEnum), default=UserRoleEnum.USER)
 
     def __str__(self):
         return self.name
@@ -39,10 +45,11 @@ class Product(db.Model):
 
 if __name__ == '__main__':
     with app.app_context():
+        #Tạo các bảng
         db.create_all()
 
         import hashlib
-        u = User(name='Admin', username='admin', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()))
+        u = User(name='Admin', username='admin', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()), user_role=UserRoleEnum.ADMIN)
         db.session.add(u)
 
         c1 = Category(name='Canon')

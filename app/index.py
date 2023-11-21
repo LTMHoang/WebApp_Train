@@ -1,3 +1,5 @@
+import math
+
 from flask import render_template, request, redirect
 from flask_login import login_user
 import dao
@@ -9,12 +11,15 @@ import hashlib
 @app.route('/')
 def index():
     kw = request.args.get('kw')
+    cate_id = request.args.get('cate_id')
+    page = request.args.get('page')
 
     cates = dao.load_categories()
 
-    pros = dao.load_products(kw)
+    pros = dao.load_products(kw, cate_id, page)
+    num = dao.count_product()
 
-    return render_template('index.html', categories=cates, products=pros)
+    return render_template('index.html', categories=cates, products=pros, pages=math.ceil(num/app.config["PAGE_SIZE"]))
 
 
 @app.route('/admin/login', methods=['post'])

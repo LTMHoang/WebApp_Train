@@ -1,12 +1,22 @@
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import Admin, BaseView, expose
 from app import app, db
-from app.models import Category, Product
+from app.models import Category, Product, UserRoleEnum
 from flask_login import current_user, logout_user
 from flask import redirect
 
 
-class MyProductView(ModelView):
+class AuthenticatedAdminMV(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.user_role == UserRoleEnum.ADMIN
+
+
+class AuthenticatedAdminBV(BaseView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.user_role == UserRoleEnum.ADMIN
+
+
+class MyProductView(AuthenticatedAdminMV):
     column_list = ['id', 'name', 'price']
     can_export = True
     column_searchable_list = ['name']
@@ -15,24 +25,15 @@ class MyProductView(ModelView):
     details_modal = True
     edit_modal = True
 
-    def is_accessible(self):
-        return current_user.is_authenticated
 
-
-class MyCategoryView(ModelView):
+class MyCategoryView(AuthenticatedAdminMV):
     column_list = ['name', 'products']
 
-    def is_accessible(self):
-        return current_user.is_authenticated
 
-
-class StatsView(BaseView):
+class StatsView(AuthenticatedAdminBV):
     @expose('/')
     def index(self):
         return self.render('admin/stats.html')
-
-    def is_accessible(self):
-        return current_user.is_authenticated
 
 
 class LogoutView(BaseView):

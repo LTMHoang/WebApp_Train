@@ -1,7 +1,9 @@
 from app.models import Category, Product, User
+from app import app
 
 
 def load_categories():
+    return Category.query.all()
     # return [{
     #     'id': 1,
     #     'name': 'Canon'
@@ -12,10 +14,25 @@ def load_categories():
     #     'id': 3,
     #     'name': 'Sony'
     # }]
-    return Category.query.all()
 
 
-def load_products(kw=None):
+def load_products(kw=None, cate_id=None, page=None):
+    pros = Product.query
+
+    if kw:
+        pros = pros.filter(Product.name.contains(kw))
+
+    if cate_id:
+        pros = pros.filter(Product.category_id.__eq__(cate_id))
+
+    if page:
+        page = int(page)
+        page_size = app.config['PAGE_SIZE']
+        start = (page - 1)*page_size
+
+        return pros.slice(start, start + page_size)
+
+    return pros.all()
     # pros = [{
     #     'id': 1,
     #     'name': 'Canon 750D',
@@ -52,12 +69,10 @@ def load_products(kw=None):
     #     pros = [p for p in pros if p['name'].find(kw) >= 0]
     #
     # return pros
-    pros = Product.query
 
-    if kw:
-        pros = pros.filter(Product.name.contains(kw))
 
-    return pros.all()
+def count_product():
+    return Product.query.count()
 
 
 def get_user_by_id(user_id):
