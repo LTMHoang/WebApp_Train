@@ -27,6 +27,7 @@ def admin_login():
     request.form.get('password')
 
 
+#Khi add vào thì methods là post
 @app.route('/api/cart', methods=['post'])
 def add_to_cart():
     """
@@ -65,9 +66,39 @@ def add_to_cart():
     return jsonify(utils.count_cart(cart))
 
 
+#Khi cập nhật thì methods là put
+@app.route('/api/cart/<product_id>', methods=['put'])
+def update_cart(product_id):
+    cart = session.get('cart')
+    if cart and product_id in cart:
+        quantity = request.json.get('quantity')
+        cart[product_id]['quantity'] = int(quantity)
+
+    session['cart'] = cart
+
+    return jsonify(utils.count_cart(cart))
+
+
+#Khi xóa thì methods là delete
+@app.route('/api/cart/<product_id>', methods=['delete'])
+def delete_cart(product_id):
+    cart = session.get('cart')
+    if cart and product_id in cart:
+        del cart[product_id]
+
+    session['cart'] = cart
+
+    return jsonify(utils.count_cart(cart))
+
+
 @app.route('/cart')
 def cart():
     return render_template('cart.html')
+
+
+@app.route('/login')
+def process_user_login():
+    return render_template('login.html')
 
 
 @login.user_loader

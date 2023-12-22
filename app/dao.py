@@ -1,4 +1,8 @@
-from app.models import Category, Product, User
+import hashlib
+
+from flask_login import current_user
+
+from app.models import *
 from app import app
 
 
@@ -77,3 +81,21 @@ def count_product():
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
+
+
+def auth_user(username, password):
+    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+
+    return User.query.filter(User.username.__eq__(username.strip()), User.password.__eq__(password)).first()
+
+
+def add_receipt(cart):
+    if cart:
+        receipt = Receipt(user=current_user)
+        db.session.add(receipt)
+
+        for c in cart.values():
+            d = ReceiptDetails(quantity=c['quantity'], price=c['price'], product_id=c['id'], receipt=receipt)
+            db.session.add(d)
+
+        db.session.commit()
