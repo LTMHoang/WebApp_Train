@@ -5,6 +5,8 @@ from flask_login import current_user
 from app.models import *
 from app import app
 
+import cloudinary.uploader
+
 
 def load_categories():
     return Category.query.all()
@@ -32,7 +34,7 @@ def load_products(kw=None, cate_id=None, page=None):
     if page:
         page = int(page)
         page_size = app.config['PAGE_SIZE']
-        start = (page - 1)*page_size
+        start = (page - 1) * page_size
 
         return pros.slice(start, start + page_size)
 
@@ -99,3 +101,17 @@ def add_receipt(cart):
             db.session.add(d)
 
         db.session.commit()
+
+
+def add_user(name, username, password, avatar):
+    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+
+    u = User(name=name, username=username, password=password,
+             avatar='https://genshin-guide.com/wp-content/uploads/yae-miko.png')
+
+    if avatar:
+        res = cloudinary.uploader.upload(avatar)
+        u.avatar = res['secure_url']
+
+    db.session.add(u)
+    db.session.commit()
