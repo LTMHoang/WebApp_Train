@@ -1,5 +1,9 @@
-<!--post để mã hóa thông tin-->
-<form method="post" action="{{ url_for('login_admin') }}">
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<h1 class="text-center text-info mt-1">ĐĂNG NHẬP NGƯỜI DÙNG</h1>
+
+<form method="post" action="">
     <div class="form-group">
         <label for="username">Username:</label>
         <input type="text" class="form-control" name="username" placeholder="Enter username" id="username">
@@ -10,3 +14,4 @@
     </div>
     <button type="submit" class="btn btn-primary">Đăng nhập</button>
 </form>
+{% endblock %}

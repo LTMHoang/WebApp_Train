@@ -1,9 +1,16 @@
 from flask_admin.contrib.sqla import ModelView
-from flask_admin import Admin, BaseView, expose
+from flask_admin import Admin, BaseView, expose, AdminIndexView
 from app import app, db
 from app.models import Category, Product, UserRoleEnum
 from flask_login import current_user, logout_user
 from flask import redirect
+import dao
+
+
+class MyAdmin(AdminIndexView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/index.html', stats=dao.count_products())
 
 
 class AuthenticatedAdminMV(ModelView):
@@ -47,7 +54,7 @@ class LogoutView(BaseView):
         return current_user.is_authenticated
 
 
-admin = Admin(app=app, name='QUẢN TRỊ BÁN HÀNG', template_mode='bootstrap4')
+admin = Admin(app=app, name='QUẢN TRỊ BÁN HÀNG', template_mode='bootstrap4', index_view=MyAdmin())
 admin.add_view(MyCategoryView(Category, db.session))
 admin.add_view(MyProductView(Product, db.session))
 admin.add_view(StatsView(name='Thống kê báo cáo'))

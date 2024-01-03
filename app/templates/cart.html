@@ -34,7 +34,7 @@
 
 <div>
     {% if current_user.is_authenticated %}
-    <button class="btn btn-access">Thanh toán</button>
+    <button class="btn btn-access btn-danger" onclick="pay()">Thanh toán</button>
     {% else %}
     <p>Vui lòng <a href="/login?next=/cart">đăng nhập</a> để thanh toán</p>
     {% endif %}
